@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Living Stones — Team Health</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #1f1f1f; --surface: #2a2a2a; --surface2: #353535;
+  --border: rgba(255,255,255,0.10); --border2: rgba(255,255,255,0.18);
+  --text: #f1ede5; --muted: #b6b1a6; --dim: #82786a;
+  --green: #6cc285; --green-bg: rgba(108,194,133,0.13);
+  --amber: #d99a4a; --amber-bg: rgba(217,154,74,0.13);
+  --red: #e57272; --red-bg: rgba(229,114,114,0.13);
+  --blue: #6aa6d6; --gold: #d4b888;
+}
+body { background: var(--bg); color: var(--text); font-family: 'Montserrat', sans-serif; font-size: 15px; line-height: 1.65; font-weight: 400; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+header { display:flex; justify-content:space-between; align-items:flex-end; padding:2.25rem 2.5rem 1.5rem; border-bottom:1px solid var(--border); flex-wrap:wrap; gap:1rem; }
+.h1 { font-family:'Montserrat',sans-serif; font-weight:300; font-size:34px; letter-spacing:-0.5px; }
+.h-sub { font-size:12px; color:var(--muted); margin-top:5px; letter-spacing:.07em; font-weight:500; }
+.h-right { text-align:right; font-size:12px; color:var(--dim); }
+.h-right b { color:var(--muted); display:block; margin-bottom:4px; font-weight:500; }
+.main { padding:2rem 2.5rem; max-width:1440px; }
+.metrics { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:2rem; }
+.metric { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:1.1rem 1.2rem; }
+.mlabel { font-size:11px; color:var(--dim); text-transform:uppercase; letter-spacing:.08em; margin-bottom:8px; font-weight:600; }
+.mval { font-family:'Montserrat',sans-serif; font-size:32px; font-weight:300; line-height:1; letter-spacing:-0.5px; }
+.msub { font-size:11px; color:var(--dim); margin-top:6px; }
+.vr { color:var(--red); } .vg { color:var(--green); } .va { color:var(--amber); }
+.tabs { display:flex; gap:2px; margin-bottom:1.5rem; border-bottom:1px solid var(--border); flex-wrap:wrap; }
+.tbtn { background:none; border:none; border-bottom:2px solid transparent; color:var(--dim); font-family:'Montserrat',sans-serif; font-weight:500; font-size:14px; padding:10px 20px; cursor:pointer; transition:all .15s; margin-bottom:-1px; }
+.tbtn:hover { color:var(--muted); }
+.tbtn.on { color:var(--gold); border-bottom-color:var(--gold); }
+.tp { display:none; }
+.tp.on { display:block; }
+.slabel { font-size:11px; text-transform:uppercase; letter-spacing:.1em; color:var(--dim); margin-bottom:.85rem; padding-bottom:.6rem; border-bottom:1px solid var(--border); font-weight:600; }
+.plist { margin-bottom:2rem; }
+.pi { display:flex; gap:14px; align-items:flex-start; padding:11px 0; border-bottom:1px solid var(--border); }
+.pi:last-child { border-bottom:none; }
+.pdot { width:7px; height:7px; border-radius:50%; flex-shrink:0; margin-top:9px; }
+.dr { background:var(--red); box-shadow:0 0 6px var(--red); }
+.da { background:var(--amber); box-shadow:0 0 6px var(--amber); }
+.db { background:var(--blue); box-shadow:0 0 6px var(--blue); }
+.pt { font-size:14px; color:var(--muted); line-height:1.6; }
+.pt strong { color:var(--text); font-weight:600; }
+.ctrls { display:flex; gap:10px; margin-bottom:1.25rem; flex-wrap:wrap; }
+.ctrls input,.ctrls select { background:var(--surface); border:1px solid var(--border2); color:var(--text); font-family:'Montserrat',sans-serif; font-size:14px; padding:8px 14px; border-radius:6px; outline:none; transition:border-color .15s; }
+.ctrls input { flex:1; min-width:200px; }
+.ctrls input:focus,.ctrls select:focus { border-color:var(--gold); }
+.tgrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:12px; margin-bottom:2rem; }
+.tcard { background:var(--surface); border:1px solid var(--border); border-radius:11px; padding:1.2rem 1.35rem; cursor:pointer; transition:border-color .15s,background .15s; }
+.tcard:hover { border-color:var(--border2); background:var(--surface2); }
+.tcard.on { border-color:var(--gold); }
+.ttop { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:.95rem; }
+.tname { font-family:'Montserrat',sans-serif; font-weight:500; font-size:17px; line-height:1.3; letter-spacing:-0.2px; }
+.tleader { font-size:12px; color:var(--muted); margin-top:3px; font-weight:400; }
+.tleader.tbd { color:var(--red); font-style:italic; }
+.sring { width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Montserrat',sans-serif; font-weight:400; font-size:18px; flex-shrink:0; border:1px solid; }
+.sg { color:var(--green); border-color:rgba(108,194,133,.45); background:var(--green-bg); }
+.sa { color:var(--amber); border-color:rgba(217,154,74,.45); background:var(--amber-bg); }
+.sr { color:var(--red); border-color:rgba(229,114,114,.45); background:var(--red-bg); }
+.sn { color:var(--dim); border-color:var(--border2); }
+.tstats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:7px; margin-bottom:.95rem; }
+.tstat { background:var(--bg); border-radius:7px; padding:9px 8px; text-align:center; }
+.tsval { font-family:'Montserrat',sans-serif; font-weight:400; font-size:19px; line-height:1; }
+.tslabel { font-size:11px; color:var(--dim); margin-top:4px; font-weight:500; }
+.frow { margin-bottom:.85rem; }
+.flabels { display:flex; justify-content:space-between; font-size:11px; color:var(--dim); margin-bottom:4px; font-weight:500; }
+.ftrack { height:5px; background:var(--bg); border-radius:3px; overflow:hidden; }
+.ffill { height:100%; border-radius:3px; transition:width .4s ease; }
+.flags { display:flex; flex-wrap:wrap; gap:5px; }
+.flag { font-size:11px; padding:3px 9px; border-radius:4px; border:1px solid var(--border); color:var(--dim); font-weight:500; }
+.fr { border-color:rgba(229,114,114,.35); color:var(--red); background:var(--red-bg); }
+.fa { border-color:rgba(217,154,74,.35); color:var(--amber); background:var(--amber-bg); }
+.fg { border-color:rgba(108,194,133,.35); color:var(--green); background:var(--green-bg); }
+.drawer { background:var(--surface2); border:1px solid var(--gold); border-radius:11px; padding:1.6rem 1.75rem; margin-bottom:1.5rem; display:none; }
+.drawer.on { display:block; animation:fi .2s ease; }
+.dtop { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.25rem; flex-wrap:wrap; gap:1rem; }
+.dtitle { font-family:'Montserrat',sans-serif; font-weight:400; font-size:22px; letter-spacing:-0.3px; }
+.dsub { font-size:13px; color:var(--muted); margin-top:4px; }
+.dacts { display:flex; gap:8px; flex-wrap:wrap; }
+.dbtn { background:none; border:1px solid var(--border2); color:var(--muted); font-family:'Montserrat',sans-serif; font-weight:500; font-size:12px; padding:7px 16px; border-radius:6px; cursor:pointer; transition:all .15s; }
+.dbtn:hover,.dbtn.hi { border-color:var(--gold); color:var(--gold); }
+.dmetrics { display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:9px; margin-bottom:1.25rem; }
+.dm { background:var(--bg); border-radius:7px; padding:11px 13px; }
+.dml { font-size:11px; color:var(--dim); text-transform:uppercase; letter-spacing:.06em; font-weight:600; }
+.dmv { font-family:'Montserrat',sans-serif; font-weight:300; font-size:24px; margin-top:3px; letter-spacing:-0.3px; }
+.dsec { font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--dim); margin:1.1rem 0 .5rem; font-weight:600; }
+.dblock { font-size:14px; color:var(--text); line-height:1.75; background:var(--bg); border-radius:7px; padding:13px 16px; white-space:pre-wrap; font-weight:400; }
+.dnote { font-size:12px; color:var(--dim); font-style:italic; margin-top:.5rem; }
+.twrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; font-size:14px; }
+thead th { text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--dim); padding:9px 14px; border-bottom:1px solid var(--border); font-weight:600; white-space:nowrap; }
+tbody tr { border-bottom:1px solid var(--border); transition:background .1s; }
+tbody tr:hover { background:var(--surface2); }
+tbody tr:last-child { border-bottom:none; }
+tbody td { padding:10px 14px; color:var(--muted); vertical-align:middle; }
+tbody td:first-child { color:var(--text); font-weight:500; }
+.rbar { display:flex; align-items:center; gap:9px; }
+.rtrack { width:60px; height:4px; background:var(--bg); border-radius:2px; overflow:hidden; flex-shrink:0; }
+.rfill { height:100%; border-radius:2px; }
+.tag { display:inline-block; font-size:11px; padding:2px 9px; border-radius:4px; border:1px solid var(--border); color:var(--dim); font-weight:500; }
+.tg { border-color:rgba(108,194,133,.4); color:var(--green); background:var(--green-bg); }
+.ta { border-color:rgba(217,154,74,.4); color:var(--amber); background:var(--amber-bg); }
+.tr { border-color:rgba(229,114,114,.4); color:var(--red); background:var(--red-bg); }
+.pager { display:flex; justify-content:flex-end; align-items:center; gap:12px; margin-top:.85rem; font-size:12px; color:var(--dim); }
+.pager button { background:none; border:1px solid var(--border2); color:var(--muted); font-family:'Montserrat',sans-serif; font-weight:500; font-size:12px; padding:5px 14px; border-radius:5px; cursor:pointer; transition:all .15s; }
+.pager button:hover:not(:disabled) { border-color:var(--gold); color:var(--gold); }
+.pager button:disabled { opacity:.25; cursor:default; }
+.psum { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:1.5rem; }
+.toast { position:fixed; bottom:1.5rem; right:1.5rem; background:var(--surface2); border:1px solid var(--gold); border-radius:9px; padding:.85rem 1.4rem; font-size:13px; color:var(--muted); display:none; z-index:999; }
+.toast.on { display:block; animation:fi .2s ease; }
+.toast strong { color:var(--gold); font-weight:600; }
+.state { padding:3rem 0; text-align:center; color:var(--muted); font-size:14px; }
+.errbox { display:none; padding:1.5rem 1.75rem; border:1px solid var(--red); background:var(--red-bg); border-radius:11px; margin-bottom:1.5rem; }
+.errbox h3 { font-family:'Montserrat',sans-serif; font-weight:500; font-size:17px; color:var(--text); margin-bottom:.5rem; }
+.errbox p { font-size:13px; color:var(--muted); line-height:1.7; }
+.warnbox { display:none; padding:.85rem 1.3rem; border:1px solid var(--amber); background:var(--amber-bg); border-radius:9px; margin-bottom:1.5rem; font-size:13px; color:var(--muted); }
+/* --- admin lock UI --- */
+.lockcard { background:var(--surface); border:1px solid var(--border); border-radius:13px; padding:2.75rem 2.25rem; text-align:center; max-width:440px; margin:3rem auto; }
+.lockicon { font-size:34px; margin-bottom:1rem; }
+.lockttl { font-family:'Montserrat',sans-serif; font-weight:400; font-size:22px; margin-bottom:.6rem; letter-spacing:-0.2px; }
+.lockmsg { font-size:14px; color:var(--muted); margin-bottom:1.5rem; line-height:1.7; }
+#pwInput { width:100%; background:var(--bg); border:1px solid var(--border2); color:var(--text); font-family:'Montserrat',sans-serif; font-size:15px; padding:11px 14px; border-radius:7px; outline:none; margin-bottom:.85rem; }
+#pwInput:focus { border-color:var(--gold); }
+.lockerr { color:var(--red); font-size:13px; margin-top:.85rem; display:none; }
+.adminbar { display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:1.5rem; padding:.85rem 1.25rem; background:var(--surface); border:1px solid var(--gold); border-radius:9px; }
+.adminbar span { color:var(--gold); font-size:13px; font-weight:500; letter-spacing:.04em; }
+.adminteam { background:var(--surface); border:1px solid var(--border); border-radius:11px; padding:1.5rem 1.75rem; margin-bottom:1rem; }
+.adminteam:hover { border-color:var(--border2); }
+@keyframes fi { from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)} }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="h1">Team Health</div>
+    <div class="h-sub">LIVING STONES CHURCH &nbsp;&middot;&nbsp; VOLUNTEER OPERATIONS</div>
+  </div>
+  <div class="h-right">
+    <div id="hmeta"><b>Loading live data&hellip;</b></div>
+    <button class="dbtn" style="margin-top:8px" onclick="reload()">&#8635; Refresh now</button>
+  </div>
+</header>
+<div class="main">
+  <div id="loading" class="state">Loading live data from your Google Sheet&hellip;</div>
+  <div id="errbox" class="errbox"></div>
+  <div id="content" style="display:none">
+    <div id="warnbox" class="warnbox"></div>
+    <div class="metrics" id="MR"></div>
+    <div class="tabs">
+      <button class="tbtn on" onclick="tab('teams',this)">Teams</button>
+      <button class="tbtn" onclick="tab('vols',this)">Volunteers</button>
+      <button class="tbtn" onclick="tab('svcs',this)">Services</button>
+      <button class="tbtn" id="adminBtn" onclick="tab('admin',this)">&#128274; Admin</button>
+    </div>
+    <div class="tp on" id="tab-teams">
+      <div class="ctrls">
+        <input type="text" id="ts" placeholder="Search team or leader&hellip;" oninput="RT()">
+        <select id="tso" onchange="RT()">
+          <option value="gd">Sort: biggest gap first</option>
+          <option value="ga">Sort: fully staffed first</option>
+          <option value="az">Sort: name A&ndash;Z</option>
+        </select>
+      </div>
+      <div class="tgrid" id="TG"></div>
+      <div class="drawer" id="DR"></div>
+    </div>
+    <div class="tp" id="tab-vols">
+      <div class="ctrls">
+        <input type="text" id="vs" placeholder="Search name or team&hellip;" oninput="vp=0;RV()">
+        <select id="vf" onchange="vp=0;RV()">
+          <option value="all">All volunteers</option>
+          <option value="concern">Concern (many declines)</option>
+          <option value="unresp">Unresponsive (many pending)</option>
+          <option value="rel">Reliable</option>
+          <option value="inactive">Inactive</option>
+        </select>
+        <select id="vs2" onchange="vp=0;RV()">
+          <option value="az">Sort: name A&ndash;Z</option>
+          <option value="cd">Sort: most confirmed</option>
+          <option value="dd">Sort: most declined</option>
+          <option value="pd">Sort: most pending</option>
+          <option value="ra">Sort: lowest reliability</option>
+          <option value="rd">Sort: highest reliability</option>
+        </select>
+      </div>
+      <div class="twrap"><table>
+        <thead><tr><th>Name</th><th>Team</th><th>Confirmed</th><th>Declined</th><th>Pending</th><th>Reliability</th><th>Status</th></tr></thead>
+        <tbody id="VB"></tbody>
+      </table></div>
+      <div class="pager"><span id="VI"></span><button id="VP" onclick="vp--;RV()">&lsaquo; Prev</button><button id="VN" onclick="vp++;RV()">Next &rsaquo;</button></div>
+    </div>
+    <div class="tp" id="tab-svcs">
+      <div class="psum" id="PS"></div>
+      <div class="slabel">Service history &mdash; most recent first</div>
+      <div class="twrap"><table>
+        <thead><tr><th>Date</th><th>Service Type</th><th>Scheduled</th><th>Confirmed</th><th>Declined</th><th>Pending</th><th>Fill rate</th></tr></thead>
+        <tbody id="PB"></tbody>
+      </table></div>
+      <div class="pager"><span id="PI"></span><button id="PPb" onclick="pp--;RPlist()">&lsaquo; Prev</button><button id="PNb" onclick="pp++;RPlist()">Next &rsaquo;</button></div>
+    </div>
+    <div class="tp" id="tab-admin">
+      <div id="adminLocked">
+        <div class="lockcard">
+          <div class="lockicon">&#128274;</div>
+          <div class="lockttl">Admin section</div>
+          <div class="lockmsg">This area contains sensitive leader feedback, succession notes, and personnel context. Enter the password to view.</div>
+          <input type="password" id="pwInput" placeholder="Password" autocomplete="off" onkeydown="if(event.key==='Enter')doUnlock()">
+          <button class="dbtn hi" style="width:100%;padding:11px" onclick="doUnlock()">Unlock</button>
+          <div id="lockErr" class="lockerr">Incorrect password.</div>
+        </div>
+      </div>
+      <div id="adminUnlockedC" style="display:none">
+        <div class="adminbar">
+          <span>&#128275; Admin view &mdash; sensitive content visible</span>
+          <button class="dbtn" onclick="doLock()">Lock again</button>
+        </div>
+        <div class="plist">
+          <div class="slabel">Priority actions &mdash; auto-flagged from latest forms</div>
+          <div id="adminPL"></div>
+        </div>
+        <div class="slabel">Full leader feedback &mdash; by team</div>
+        <div id="adminTeams"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+/* ============================================================
+   Living Stones — Team Health dashboard
+   Reads live from the "PCO Volunteer Dashboard" Google Sheet.
+   No Cowork / Claude required — refreshes every time it opens.
+   ============================================================ */
+const SHEET_ID = '1QQiiEIGEE_x5emgPU9vCyA32qNSrlZIBq6bbqVZyhWM';
+/* Admin password is SHA-256 hashed.  Default password: "lschurches".
+   To change: open dev tools console on this page and run:
+     (async()=>{const h=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('YOUR_NEW_PASSWORD'));console.log([...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,'0')).join(''))})()
+   Then paste the printed hash below in place of the current ADMIN_HASH. */
+const ADMIN_HASH = 'b89b95790b740ffc4317734a8c456eb680d6a19dea09131b0b513943794e9fa6';
+
+const gviz = (tab) =>
+  'https://docs.google.com/spreadsheets/d/' + SHEET_ID +
+  '/gviz/tq?tqx=out:csv&headers=1&sheet=' + encodeURIComponent(tab) +
+  '&_cb=' + Date.now();
+
+let TEAMS = [], VOLS = [], PLANS = [], META = {};
+let AT = null, vp = 0, pp = 0;
+let adminUnlocked = false;
+const VP = 25, PP = 40;
+
+/* ---------- helpers ---------- */
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function num(v){ if(v==null) return 0; const n=parseFloat(String(v).replace(/[^0-9.\-]/g,'')); return isNaN(n)?0:n; }
+function parseDate(v){
+  if(!v) return null;
+  if(v instanceof Date) return isNaN(v)?null:v;
+  let s=String(v).trim();
+  let m=s.match(/^Date\((\d+),(\d+),(\d+)(?:,(\d+),(\d+),(\d+))?\)/);
+  if(m) return new Date(+m[1],+m[2],+m[3],+(m[4]||0),+(m[5]||0),+(m[6]||0));
+  let d=new Date(s);
+  return isNaN(d)?null:d;
+}
+function fmtFull(d){ return d?d.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}):'—'; }
+function fmtShort(d){ return d?d.toLocaleDateString('en-US',{month:'short',day:'numeric'}):'—'; }
+async function sha256(t){ const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''); }
+
+/* ---------- RFC-4180 CSV parser ---------- */
+function parseCSV(text){
+  const rows=[]; let row=[], field='', inQ=false, i=0;
+  while(i<text.length){
+    const ch=text[i];
+    if(inQ){
+      if(ch==='"'){ if(text[i+1]==='"'){field+='"';i+=2;continue;} inQ=false;i++;continue; }
+      field+=ch;i++;continue;
+    }
+    if(ch==='"'){inQ=true;i++;continue;}
+    if(ch===','){row.push(field);field='';i++;continue;}
+    if(ch==='\r'){i++;continue;}
+    if(ch==='\n'){row.push(field);rows.push(row);row=[];field='';i++;continue;}
+    field+=ch;i++;
+  }
+  if(field!==''||row.length){row.push(field);rows.push(row);}
+  return rows;
+}
+function toObjects(rows, sigRegex){
+  let hi=rows.findIndex(r=>sigRegex.test(r.join('').toLowerCase()));
+  if(hi<0) hi=0;
+  const headers=rows[hi].map(h=>String(h).trim());
+  const out=[];
+  for(let j=hi+1;j<rows.length;j++){
+    const r=rows[j];
+    if(!r.some(c=>String(c).trim()!=='')) continue;
+    const o={_:{}};
+    headers.forEach((h,k)=>{ const val=r[k]!==undefined?r[k]:''; o[h]=val; o._[h.toLowerCase()]=val; });
+    out.push(o);
+  }
+  return out;
+}
+function F(o, sub){
+  if(o[sub]!==undefined) return o[sub];
+  const lk=sub.toLowerCase();
+  const key=Object.keys(o._||{}).find(k=>k.includes(lk));
+  return key?o._[key]:'';
+}
+
+/* ---------- fetch ---------- */
+async function fetchTab(tab){
+  const res=await fetch(gviz(tab),{cache:'no-store'});
+  if(!res.ok) throw new Error(tab+': HTTP '+res.status);
+  let text=(await res.text()).replace(/^﻿/,'');
+  if(/^\s*<(!doctype|html)/i.test(text))
+    throw new Error(tab+': received a web page instead of data — the sheet may not be shared as "Anyone with the link can view".');
+  return parseCSV(text);
+}
+
+/* ---------- team-name normalisation ---------- */
+const TEAM_ALIASES={
+  'coffee':'Coffee Team','coffee team':'Coffee Team',
+  'prayer':'Prayer Team','prayer team':'Prayer Team',
+  'connect':'Connection Team','connect desk':'Connection Team','connection':'Connection Team','connection team':'Connection Team',
+  'worship, tech':'Worship & Tech','worship and tech':'Worship & Tech','worship & tech':'Worship & Tech','worship/tech':'Worship & Tech','worship':'Worship & Tech','tech':'Worship & Tech',
+  'safety':'Safety Team','safety team':'Safety Team',
+  'first impression':'First Impressions','first impressions':'First Impressions',
+  'enrichment':'Enrichment','enrichment team':'Enrichment','enrichment teams':'Enrichment',
+  'hospitality':'Hospitality','hospitality team':'Hospitality',
+  'ls students':'LS Students','ls student leaders':'LS Students','ls student':'LS Students',
+  'ls kids':'LS Kids','helps':'HELPS',
+  'hands to heart':'Hands to Heart','hands to heart leader':'Hands to Heart',
+  'parking':'Parking','parking team':'Parking',
+  'stepping stones':'Stepping Stones',
+  'breakfast team':'Breakfast Team','breakfast':'Breakfast Team',
+  'service captains':'Service Captains','presiders':'Presiders','preachers':'Preachers',
+  'counting team':'Counting Team','counting':'Counting Team','content team':'Content Team'
+};
+function normTeam(v){
+  let s=String(v||'').replace(/\s+/g,' ').trim();
+  if(!s) return 'Unspecified';
+  const key=s.toLowerCase();
+  if(TEAM_ALIASES[key]) return TEAM_ALIASES[key];
+  return s.replace(/\w\S*/g,w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase());
+}
+
+/* ---------- builders ---------- */
+function buildVols(rows){
+  const objs=toObjects(rows,/reliability|volunteer/);
+  VOLS=objs.map(o=>({
+    n:String(F(o,'volunteer')).trim(),
+    t:String(F(o,'primary team')).trim()||'—',
+    c:num(F(o,'confirmed')), d:num(F(o,'declined')), p:num(F(o,'pending')),
+    r:num(F(o,'reliability'))
+  })).filter(v=>v.n);
+}
+function buildPlans(rows){
+  const objs=toObjects(rows,/service date|scheduled/);
+  PLANS=objs.map(o=>{
+    const dt=parseDate(F(o,'service date'));
+    return {date:dt, ds:dt?fmtFull(dt):String(F(o,'service date')||'').trim(),
+      ty:String(F(o,'service type')).trim()||'—',
+      s:num(F(o,'scheduled')), c:num(F(o,'confirmed')),
+      d:num(F(o,'declined')), p:num(F(o,'pending'))};
+  }).filter(p=>p.date||p.s);
+  PLANS.sort((a,b)=>(b.date?b.date.getTime():0)-(a.date?a.date.getTime():0));
+}
+function buildTeams(rows){
+  const objs=toObjects(rows,/submitted|person/);
+  const byTeam={};
+  objs.forEach(o=>{
+    const team=normTeam(F(o,'q1'));
+    if(team==='Unspecified') return;
+    const sub=parseDate(F(o,'submitted'));
+    const q2=String(F(o,'q2')).trim();
+    const rec={
+      n:team, l:String(F(o,'person')).trim()||'—',
+      sub:sub, subStr:sub?fmtFull(sub):String(F(o,'submitted')||'—'), subC:fmtShort(sub),
+      sc: q2===''?null:num(q2),
+      mem:num(F(o,'q3')), need:num(F(o,'q4')),
+      iss:String(F(o,'q5')).trim(), more:String(F(o,'q6')).trim(),
+      res:String(F(o,'q7')).trim(), suc:String(F(o,'q8')).trim()
+    };
+    const prev=byTeam[team];
+    const newer = !prev || (rec.sub && (!prev.sub || rec.sub>prev.sub));
+    if(newer) byTeam[team]=rec;
+  });
+  TEAMS=Object.values(byTeam);
+}
+function buildMeta(rows){
+  META={};
+  rows.forEach(r=>{
+    const k=String(r[0]||'').toLowerCase().trim();
+    const v=String(r[1]||'').trim();
+    if(/last refreshed/.test(k)) META.refreshed=v;
+    else if(/lookback/.test(k)) META.lookback=v;
+    else if(/^source/.test(k)) META.source=v;
+    else if(/refresh schedule/.test(k)) META.schedule=v;
+  });
+}
+
+/* ---------- shared calcs ---------- */
+function recentCompleted(n){
+  const now=new Date();
+  return PLANS.filter(p=>p.date && p.date<=now && p.s>0).slice(0,n);
+}
+function fc(need){return need===0?'var(--green)':need<=5?'var(--amber)':'var(--red)';}
+function rc(r){return r>=70?'var(--green)':r>=40?'var(--amber)':'var(--red)';}
+function scl(s){return s>=8?'sg':s>=6?'sa':'sr';}
+
+/* volunteer status — concern is reserved for many declines only */
+function vStatus(v){
+  if(v.c===0 && v.d===0 && v.p===0) return {cls:'tag', txt:'inactive'};
+  if(v.d>=8) return {cls:'tr', txt:'concern'};
+  if(v.p>=6) return {cls:'ta', txt:'unresponsive'};
+  return {cls:'tg', txt:'reliable'};
+}
+
+/* ---------- renderers ---------- */
+function renderAll(){ renderHeader(); RM(); RT(); RV(); RSP(); renderAdmin(); }
+
+function renderHeader(){
+  const pulled=new Date().toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+  document.getElementById('hmeta').innerHTML=
+    '<b>Sheet last refreshed: '+esc(META.refreshed||'unknown')+'</b>'+
+    'Dashboard pulled live '+esc(pulled)+'<br>'+
+    'Source: '+esc(META.source||'Planning Center Online')+
+    (META.lookback?' &middot; '+esc(META.lookback)+' window':'');
+}
+
+function RM(){
+  const gap=TEAMS.reduce((a,t)=>a+(t.need||0),0);
+  const recent=recentCompleted(6);
+  const fill=recent.length?Math.round(recent.reduce((a,p)=>a+(p.s?p.c/p.s:0),0)/recent.length*100):0;
+  const rel=VOLS.length?Math.round(VOLS.reduce((a,v)=>a+v.r,0)/VOLS.length):0;
+  const concern=VOLS.filter(v=>vStatus(v).txt==='concern').length;
+  document.getElementById('MR').innerHTML=
+    '<div class="metric"><div class="mlabel">Teams reporting</div><div class="mval">'+TEAMS.length+'</div><div class="msub">leader forms on file</div></div>'+
+    '<div class="metric"><div class="mlabel">Total volunteers</div><div class="mval">'+VOLS.length+'</div><div class="msub">in Planning Center</div></div>'+
+    '<div class="metric"><div class="mlabel">Staffing gap</div><div class="mval vr">'+gap+'</div><div class="msub">more people requested</div></div>'+
+    '<div class="metric"><div class="mlabel">Recent fill rate</div><div class="mval '+(fill>=75?'vg':fill>=60?'va':'vr')+'">'+fill+'%</div><div class="msub">last 6 services</div></div>'+
+    '<div class="metric"><div class="mlabel">Avg reliability</div><div class="mval '+(rel>=75?'vg':rel>=50?'va':'vr')+'">'+rel+'%</div><div class="msub">all volunteers</div></div>'+
+    '<div class="metric"><div class="mlabel">Volunteers of concern</div><div class="mval '+(concern===0?'vg':'vr')+'">'+concern+'</div><div class="msub">many declines</div></div>';
+}
+
+function RT(){
+  const q=document.getElementById('ts').value.toLowerCase();
+  const so=document.getElementById('tso').value;
+  let list=TEAMS.filter(t=>t.n.toLowerCase().includes(q)||(t.l||'').toLowerCase().includes(q));
+  list.sort((a,b)=>{
+    if(so==='gd') return (b.need||0)-(a.need||0);
+    if(so==='ga') return (a.need||0)-(b.need||0);
+    return a.n.localeCompare(b.n);
+  });
+  if(!list.length){ document.getElementById('TG').innerHTML='<div class="state">No teams match.</div>'; return; }
+  document.getElementById('TG').innerHTML=list.map(t=>{
+    const have=t.mem, need=t.need||0;
+    const fp=(have+need)>0?Math.round(have/(have+need)*100):100;
+    const flags=[];
+    if(need>=30) flags.push({l:'gap: '+need,c:'fr'});
+    else if(need>5) flags.push({l:'gap: '+need,c:'fa'});
+    else if(need===0) flags.push({l:'fully staffed',c:'fg'});
+    else flags.push({l:'gap: '+need,c:'flag'});
+    return '<div class="tcard'+(AT===t.n?' on':'')+'" onclick="TD(this.dataset.n)" data-n="'+esc(t.n)+'">'+
+      '<div class="ttop">'+
+        '<div><div class="tname">'+esc(t.n)+'</div><div class="tleader">'+esc(t.l||'—')+'</div></div>'+
+      '</div>'+
+      '<div class="tstats">'+
+        '<div class="tstat"><div class="tsval">'+have+'</div><div class="tslabel">members</div></div>'+
+        '<div class="tstat"><div class="tsval" style="color:'+fc(need)+'">'+need+'</div><div class="tslabel">still needed</div></div>'+
+        '<div class="tstat"><div class="tsval" style="font-size:13px;padding-top:3px">'+esc(t.subC)+'</div><div class="tslabel">updated</div></div>'+
+      '</div>'+
+      '<div class="frow">'+
+        '<div class="flabels"><span>Staffing '+have+'/'+(have+need)+'</span><span>'+fp+'%</span></div>'+
+        '<div class="ftrack"><div class="ffill" style="width:'+fp+'%;background:'+fc(need)+'"></div></div>'+
+      '</div>'+
+      '<div class="flags">'+flags.map(f=>'<span class="flag '+f.c+'">'+f.l+'</span>').join('')+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+function TD(name){
+  if(AT===name){ closeDR(); return; }
+  AT=name;
+  const t=TEAMS.find(x=>x.n===name);
+  if(!t) return;
+  const have=t.mem, need=t.need||0;
+  const fp=(have+need)>0?Math.round(have/(have+need)*100):100;
+  const DR=document.getElementById('DR');
+  DR.innerHTML=
+    '<div class="dtop">'+
+      '<div><div class="dtitle">'+esc(t.n)+'</div><div class="dsub">Leader: '+esc(t.l||'—')+' &middot; Reported: '+esc(t.subStr)+'</div></div>'+
+      '<div class="dacts"><button class="dbtn" onclick="closeDR()">&#10005;</button></div>'+
+    '</div>'+
+    '<div class="dmetrics">'+
+      '<div class="dm"><div class="dml">Members</div><div class="dmv">'+have+'</div></div>'+
+      '<div class="dm"><div class="dml">Still needed</div><div class="dmv" style="color:'+fc(need)+'">'+need+'</div></div>'+
+      '<div class="dm"><div class="dml">Staffed</div><div class="dmv">'+fp+'%</div></div>'+
+    '</div>'+
+    '<div class="dnote">Detailed leader feedback, succession notes, and resources requested are in the Admin section.</div>';
+  DR.classList.add('on');
+  DR.scrollIntoView({behavior:'smooth',block:'nearest'});
+  RT();
+}
+function closeDR(){ AT=null; document.getElementById('DR').classList.remove('on'); RT(); }
+
+function CP(txt){
+  navigator.clipboard.writeText(txt)
+    .then(()=>toast('<strong>Copied.</strong> Paste into Claude.'))
+    .catch(()=>toast('Copy failed — select the text manually.'));
+}
+
+function RV(){
+  const q=document.getElementById('vs').value.toLowerCase();
+  const f=document.getElementById('vf').value;
+  const s=document.getElementById('vs2').value;
+  let list=VOLS.filter(v=>{
+    const m=v.n.toLowerCase().includes(q)||v.t.toLowerCase().includes(q);
+    if(!m) return false;
+    const st=vStatus(v).txt;
+    if(f==='concern') return st==='concern';
+    if(f==='unresp') return st==='unresponsive';
+    if(f==='rel') return st==='reliable';
+    if(f==='inactive') return st==='inactive';
+    return true;
+  });
+  list.sort((a,b)=>{
+    if(s==='cd') return b.c-a.c;
+    if(s==='dd') return b.d-a.d;
+    if(s==='pd') return b.p-a.p;
+    if(s==='ra') return a.r-b.r;
+    if(s==='rd') return b.r-a.r;
+    return a.n.localeCompare(b.n);
+  });
+  const tot=list.length, pages=Math.max(1,Math.ceil(tot/VP));
+  if(vp>=pages) vp=pages-1;
+  if(vp<0) vp=0;
+  const sl=list.slice(vp*VP,vp*VP+VP);
+  document.getElementById('VB').innerHTML = sl.length ? sl.map(v=>{
+    const st=vStatus(v);
+    return '<tr>'+
+      '<td>'+esc(v.n)+'</td><td style="color:var(--dim)">'+esc(v.t)+'</td>'+
+      '<td style="color:var(--green);font-weight:500">'+v.c+'</td>'+
+      '<td style="color:'+(v.d>0?'var(--red)':'var(--dim)')+'">'+(v.d||'—')+'</td>'+
+      '<td style="color:'+(v.p>0?'var(--amber)':'var(--dim)')+'">'+(v.p||'—')+'</td>'+
+      '<td><div class="rbar"><div class="rtrack"><div class="rfill" style="width:'+Math.min(100,v.r)+'%;background:'+rc(v.r)+'"></div></div><span style="color:var(--muted);min-width:42px">'+v.r+'%</span></div></td>'+
+      '<td><span class="tag '+st.cls+'">'+st.txt+'</span></td>'+
+    '</tr>';
+  }).join('') : '<tr><td colspan="7" style="text-align:center;padding:1.5rem">No volunteers match.</td></tr>';
+  document.getElementById('VI').textContent = tot ? (vp*VP+1)+'–'+Math.min((vp+1)*VP,tot)+' of '+tot : '0';
+  document.getElementById('VP').disabled = vp===0;
+  document.getElementById('VN').disabled = vp>=pages-1;
+}
+
+function RSP(){
+  const recent=recentCompleted(6);
+  const af=recent.length?Math.round(recent.reduce((a,p)=>a+(p.s?p.c/p.s:0),0)/recent.length*100):0;
+  const ad=recent.length?Math.round(recent.reduce((a,p)=>a+p.d,0)/recent.length):0;
+  const ts=recent.reduce((a,p)=>a+p.s,0);
+  document.getElementById('PS').innerHTML=
+    '<div class="metric"><div class="mlabel">Recent fill rate</div><div class="mval '+(af>=75?'vg':af>=60?'va':'vr')+'">'+af+'%</div><div class="msub">last 6 services</div></div>'+
+    '<div class="metric"><div class="mlabel">Avg declines</div><div class="mval va">'+ad+'</div><div class="msub">per recent service</div></div>'+
+    '<div class="metric"><div class="mlabel">Scheduled</div><div class="mval">'+ts+'</div><div class="msub">last 6 services</div></div>'+
+    '<div class="metric"><div class="mlabel">Services tracked</div><div class="mval">'+PLANS.length+'</div><div class="msub">full history</div></div>';
+  RPlist();
+}
+function RPlist(){
+  const tot=PLANS.length, pages=Math.max(1,Math.ceil(tot/PP));
+  if(pp>=pages) pp=pages-1;
+  if(pp<0) pp=0;
+  const sl=PLANS.slice(pp*PP,pp*PP+PP);
+  document.getElementById('PB').innerHTML = sl.length ? sl.map(p=>{
+    const f=p.s>0?Math.round(p.c/p.s*100):0;
+    const frc=f>=75?'var(--green)':f>=60?'var(--amber)':'var(--red)';
+    return '<tr>'+
+      '<td>'+esc(p.ds)+'</td><td style="color:var(--dim)">'+esc(p.ty)+'</td>'+
+      '<td>'+p.s+'</td><td style="color:var(--green)">'+p.c+'</td>'+
+      '<td style="color:'+(p.d>0?'var(--red)':'var(--dim)')+'">'+(p.d||'—')+'</td>'+
+      '<td style="color:'+(p.p>0?'var(--amber)':'var(--dim)')+'">'+(p.p||'—')+'</td>'+
+      '<td><div class="rbar"><div class="rtrack" style="width:80px"><div class="rfill" style="width:'+f+'%;background:'+frc+'"></div></div><span style="color:'+frc+'">'+(p.s>0?f+'%':'—')+'</span></div></td>'+
+    '</tr>';
+  }).join('') : '<tr><td colspan="7" style="text-align:center;padding:1.5rem">No service data.</td></tr>';
+  document.getElementById('PI').textContent = tot ? (pp*PP+1)+'–'+Math.min((pp+1)*PP,tot)+' of '+tot : '0';
+  document.getElementById('PPb').disabled = pp===0;
+  document.getElementById('PNb').disabled = pp>=pages-1;
+}
+
+/* ---------- admin (gated) ---------- */
+async function doUnlock(){
+  const pw=document.getElementById('pwInput').value;
+  if(!pw){ return; }
+  const h=await sha256(pw);
+  if(h===ADMIN_HASH){
+    adminUnlocked=true;
+    try{ sessionStorage.setItem('ts_admin','1'); }catch(e){}
+    document.getElementById('pwInput').value='';
+    document.getElementById('lockErr').style.display='none';
+    document.getElementById('adminBtn').innerHTML='&#128275; Admin';
+    showAdmin();
+  } else {
+    document.getElementById('lockErr').style.display='block';
+  }
+}
+function doLock(){
+  adminUnlocked=false;
+  try{ sessionStorage.removeItem('ts_admin'); }catch(e){}
+  document.getElementById('adminBtn').innerHTML='&#128274; Admin';
+  document.getElementById('adminLocked').style.display='block';
+  document.getElementById('adminUnlockedC').style.display='none';
+}
+function showAdmin(){
+  document.getElementById('adminLocked').style.display='none';
+  document.getElementById('adminUnlockedC').style.display='block';
+  renderAdminContent();
+}
+function renderAdmin(){
+  /* called after data loads — restore admin view if previously unlocked */
+  if(adminUnlocked){
+    document.getElementById('adminBtn').innerHTML='&#128275; Admin';
+    showAdmin();
+  }
+}
+function renderAdminContent(){
+  /* priority actions */
+  const ranked=TEAMS.map(t=>{
+    let lvl=0;
+    if((t.sc!=null&&t.sc<6)||t.need>=30) lvl=2;
+    else if((t.sc!=null&&t.sc<8)||t.need>5||t.sc==null) lvl=1;
+    return {t,lvl};
+  }).filter(x=>x.lvl>0)
+    .sort((a,b)=> b.lvl-a.lvl || (a.t.sc==null?99:a.t.sc)-(b.t.sc==null?99:b.t.sc) || b.t.need-a.t.need)
+    .slice(0,10);
+  const PL=document.getElementById('adminPL');
+  if(!ranked.length){
+    PL.innerHTML='<div class="pi"><div class="pdot db"></div><div class="pt">No teams currently flagged &mdash; every reporting team looks healthy.</div></div>';
+  } else {
+    PL.innerHTML=ranked.map(({t,lvl})=>{
+      const cls=lvl===2?'dr':'da';
+      const bits=[];
+      bits.push(t.sc!=null?('Score '+t.sc+'/10'):'No score reported');
+      if(t.need>0) bits.push('needs '+t.need+' more');
+      let snip=t.iss?t.iss.replace(/\s+/g,' ').trim():'';
+      if(snip.length>200) snip=snip.slice(0,197)+'…';
+      return '<div class="pi"><div class="pdot '+cls+'"></div><div class="pt"><strong>'+esc(t.n)+'</strong> &mdash; '+esc(bits.join(' · '))+(snip?'. '+esc(snip):'')+'</div></div>';
+    }).join('');
+  }
+  /* per-team full feedback, sorted worst score first */
+  const sorted=TEAMS.slice().sort((a,b)=>{
+    const sa=a.sc==null?99:a.sc, sb=b.sc==null?99:b.sc;
+    if(sa!==sb) return sa-sb;
+    return (b.need||0)-(a.need||0);
+  });
+  document.getElementById('adminTeams').innerHTML=sorted.map(t=>{
+    const have=t.mem, need=t.need||0;
+    const fp=(have+need)>0?Math.round(have/(have+need)*100):100;
+    const ap='Give me a specific 3-step action plan for the '+t.n+' team at Living Stones Church. Issues: '+t.iss;
+    const cp='Draft a check-in message from Brad to '+t.l+' about the '+t.n+' team at Living Stones Church. Their reported issues: '+t.iss;
+    return '<div class="adminteam">'+
+      '<div class="dtop">'+
+        '<div><div class="dtitle">'+esc(t.n)+'</div><div class="dsub">Leader: '+esc(t.l||'—')+' &middot; Score: '+(t.sc==null?'N/A':t.sc+'/10')+' &middot; Reported: '+esc(t.subStr)+'</div></div>'+
+        '<div class="dacts">'+
+          '<button class="dbtn hi" data-p="'+esc(ap)+'" onclick="CP(this.dataset.p)">Copy action plan &#8599;</button>'+
+          '<button class="dbtn" data-p="'+esc(cp)+'" onclick="CP(this.dataset.p)">Copy check-in &#8599;</button>'+
+        '</div>'+
+      '</div>'+
+      '<div class="dmetrics">'+
+        '<div class="dm"><div class="dml">Members</div><div class="dmv">'+have+'</div></div>'+
+        '<div class="dm"><div class="dml">Still needed</div><div class="dmv" style="color:'+fc(need)+'">'+need+'</div></div>'+
+        '<div class="dm"><div class="dml">Staffed</div><div class="dmv">'+fp+'%</div></div>'+
+        '<div class="dm"><div class="dml">Leader score</div><div class="dmv">'+(t.sc==null?'—':t.sc+'/10')+'</div></div>'+
+      '</div>'+
+      (t.iss?'<div class="dsec">Issues &amp; context</div><div class="dblock">'+esc(t.iss)+'</div>':'')+
+      (t.more?'<div class="dsec">Additional notes</div><div class="dblock">'+esc(t.more)+'</div>':'')+
+      (t.res?'<div class="dsec">Resources requested</div><div class="dblock">'+esc(t.res)+'</div>':'')+
+      (t.suc?'<div class="dsec">Succession</div><div class="dblock">'+esc(t.suc)+'</div>':'')+
+    '</div>';
+  }).join('');
+}
+
+function tab(name,btn){
+  document.querySelectorAll('.tp').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('tab-'+name).classList.add('on');
+  btn.classList.add('on');
+  if(name==='admin' && !adminUnlocked){
+    setTimeout(()=>{ const i=document.getElementById('pwInput'); if(i) i.focus(); },50);
+  }
+}
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.innerHTML=msg; t.classList.add('on');
+  clearTimeout(t._t);
+  t._t=setTimeout(()=>t.classList.remove('on'),3000);
+}
+
+/* ---------- load / error states ---------- */
+function showError(msg){
+  document.getElementById('loading').style.display='none';
+  document.getElementById('content').style.display='none';
+  const e=document.getElementById('errbox');
+  e.style.display='block';
+  e.innerHTML='<h3>Couldn’t load live data from the Google Sheet</h3>'+
+    '<p>'+esc(msg)+'</p>'+
+    '<p style="margin-top:.5rem">Make sure the &ldquo;PCO Volunteer Dashboard&rdquo; sheet is shared as <strong>Anyone with the link &rarr; Viewer</strong>, then press <strong>Refresh now</strong> above. If you’re offline, reconnect and try again.</p>';
+  document.getElementById('hmeta').innerHTML='<b style="color:var(--red)">Live data unavailable</b>Press Refresh now to retry';
+}
+function showWarn(failed){
+  const w=document.getElementById('warnbox');
+  if(!failed.length){ w.style.display='none'; return; }
+  w.style.display='block';
+  w.innerHTML='&#9888; Some tabs couldn’t be read ('+esc(failed.join(', '))+'). The rest of the dashboard is still live.';
+}
+
+async function init(){
+  try{ adminUnlocked = sessionStorage.getItem('ts_admin')==='1'; }catch(e){ adminUnlocked=false; }
+  document.getElementById('errbox').style.display='none';
+  document.getElementById('loading').style.display='block';
+  document.getElementById('hmeta').innerHTML='<b>Loading live data&hellip;</b>';
+  const tabs=['Volunteers','Plans','Leader Forms','About'];
+  const settled=await Promise.allSettled(tabs.map(fetchTab));
+  const [vol,plan,form,about]=settled;
+  const failed=[];
+  if(vol.status==='fulfilled') buildVols(vol.value); else { VOLS=[]; failed.push('Volunteers'); }
+  if(plan.status==='fulfilled') buildPlans(plan.value); else { PLANS=[]; failed.push('Plans'); }
+  if(form.status==='fulfilled') buildTeams(form.value); else { TEAMS=[]; failed.push('Leader Forms'); }
+  if(about.status==='fulfilled') buildMeta(about.value); else { META={}; }
+
+  if(failed.length>=3){
+    const firstErr=[vol,plan,form].find(r=>r.status==='rejected');
+    showError(firstErr&&firstErr.reason?firstErr.reason.message:'The sheet could not be reached.');
+    return;
+  }
+  document.getElementById('loading').style.display='none';
+  document.getElementById('content').style.display='block';
+  showWarn(failed);
+  renderAll();
+}
+function reload(){ vp=0; pp=0; AT=null; toast('Refreshing&hellip;'); init(); }
+
+init();
+</script>
+</body>
+</html>
