@@ -1,2 +1,2 @@
-# ussr-dashboard
+# lssr-dashboard
 LSSR Team Health Dashboard
